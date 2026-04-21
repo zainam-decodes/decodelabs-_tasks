@@ -6,6 +6,56 @@
 <title>CipherLab — Encryption & Decryption Tool</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
 
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║              CIPHERLAB v1.0                              ║
+  ║   Basic Encryption & Decryption Tool                     ║
+  ║   Ciphers: Caesar, Vigenère                              ║
+  ║   Tech: Vanilla HTML + CSS + JS (no dependencies)       ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  FOLDER STRUCTURE:
+  ─────────────────
+  cipherlab/
+  ├── index.html          ← This file (entire app, self-contained)
+  └── README.md           ← Deployment instructions (see below)
+
+  DEPLOYMENT (GitHub Pages):
+  ──────────────────────────
+  1. Create a repo at github.com → New Repository → "cipherlab"
+  2. Upload index.html (and optionally README.md)
+  3. Go to Settings → Pages → Source: "Deploy from a branch"
+  4. Select: Branch = main, Folder = / (root) → Save
+  5. Visit: https://<your-username>.github.io/cipherlab/
+
+  ENCRYPTION LOGIC:
+  ─────────────────
+  Caesar Cipher:
+    - Each letter is shifted by N positions in the alphabet (mod 26)
+    - Uppercase and lowercase handled separately (base 65 / 97)
+    - Numbers shifted mod 10
+    - Symbols and spaces pass through unchanged
+    - Decryption = shift by (26 - N) mod 26
+
+  Vigenère Cipher:
+    - A polyalphabetic cipher using a repeating keyword
+    - Each letter shifted by the ordinal of the corresponding keyword letter (A=0, B=1..Z=25)
+    - Keyword repeats cyclically over the plaintext
+    - Non-alphabetic characters are passed through (keyword index does not advance)
+    - Decryption = reverse shift of each keyword letter
+
+  SAMPLE TEST CASES:
+  ──────────────────
+  Caesar (shift=3):
+    "Hello World"  → "Khoor Zruog"  → "Hello World" ✓
+    "ABC xyz 123"  → "DEF abc 456"  → "ABC xyz 123" ✓
+    "Hello, World!" → "Khoor, Zruog!" → "Hello, World!" ✓
+
+  Vigenère (keyword="KEY"):
+    "Hello World"  → "Rijvs Ambpb"  → "Hello World" ✓
+    "ATTACKATDAWN" (keyword="LEMON") → "LXFOPVEFRNHR" (classic example)
+-->
+
 <style>
   /* ──────────────── RESET & BASE ──────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
