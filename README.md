@@ -27,3 +27,4 @@ Points awarded for: length ≥ 8, length ≥ 12, uppercase, lowercase, number, s
 ## Files
 - `index.html` — complete single-file application
 - `README.md`  — this file
+VIEW THE SITE -https://zainam-decodes.github.io/decodelabs-_tasks/
