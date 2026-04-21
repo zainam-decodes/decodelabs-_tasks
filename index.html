@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cyber Security Projects</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #0f172a, #020617);
+  color: white;
+  text-align: center;
+}
+
+/* Title */
+h1 {
+  font-size: 3rem;
+  margin-top: 40px;
+  color: #0ff;
+  text-shadow: 0 0 20px #0ff;
+}
+
+/* Container */
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 80px;
+  flex-wrap: wrap;
+}
+
+/* Cards */
+.card {
+  width: 300px;
+  padding: 30px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid transparent;
+  transition: 0.3s;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+/* Neon Borders */
+.card.p1 {
+  border-color: #ff00ff;
+  box-shadow: 0 0 20px #ff00ff;
+}
+
+.card.p2 {
+  border-color: #00ffff;
+  box-shadow: 0 0 20px #00ffff;
+}
+
+/* Hover */
+.card:hover {
+  transform: scale(1.08);
+}
+
+/* Text */
+.card h2 {
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Button */
+.btn {
+  margin-top: 20px;
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid;
+}
+
+.p1 .btn {
+  border-color: #ff00ff;
+}
+
+.p2 .btn {
+  border-color: #00ffff;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚀 CYBER SECURITY PROJECTS</h1>
+
+<div class="container">
+
+  <!-- Project 1 -->
+  <div class="card p1" onclick="window.location.href='project1-passwordstrengthchecker/index.html'">
+    <h2>🔐 Password Strength Checker</h2>
+    <p>Analyze password security using validation logic.</p>
+    <div class="btn">Launch Project</div>
+  </div>
+
+  <!-- Project 2 -->
+  <div class="card p2" onclick="window.location.href='project2-encryption-decryption/index.html'">
+    <h2>🔏 Encryption & Decryption</h2>
+    <p>Secure data using encryption algorithms.</p>
+    <div class="btn">Launch Project</div>
+  </div>
+
+</div>
+
+</body>
+</html>
