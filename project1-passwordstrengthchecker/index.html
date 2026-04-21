@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Strength Checker</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f9f9f7;--surface:#ffffff;--surface2:#f2f2ef;
+      --border:rgba(0,0,0,0.10);--border-md:rgba(0,0,0,0.18);
+      --text-1:#1a1a18;--text-2:#555550;--text-3:#999990;
+      --radius-md:8px;--radius-lg:12px;
+      --danger-bg:#FCEBEB;--danger-bd:#F09595;--danger-tx:#A32D2D;
+      --warn-bg:#FAEEDA;--warn-bd:#FAC775;--warn-tx:#854F0B;
+      --success-bg:#EAF3DE;--success-bd:#97C459;--success-tx:#3B6D11;
+    }
+    @media (prefers-color-scheme:dark){
+      :root{
+        --bg:#1c1c1a;--surface:#242422;--surface2:#2e2e2b;
+        --border:rgba(255,255,255,0.10);--border-md:rgba(255,255,255,0.18);
+        --text-1:#f0efe8;--text-2:#a8a89f;--text-3:#666660;
+        --danger-bg:#501313;--danger-bd:#A32D2D;--danger-tx:#F09595;
+        --warn-bg:#412402;--warn-bd:#854F0B;--warn-tx:#FAC775;
+        --success-bg:#173404;--success-bd:#3B6D11;--success-tx:#97C459;
+      }
+    }
+    body{background:var(--bg);font-family:'Syne',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:2rem 2rem 2.5rem;width:100%;max-width:520px;box-shadow:0 2px 24px rgba(0,0,0,0.06);}
+    .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px;}
+    h1{font-size:22px;font-weight:800;color:var(--text-1);margin-bottom:1.75rem;line-height:1.2;}
+    .input-wrap{position:relative;margin-bottom:1.25rem;}
+    .input-wrap input{width:100%;font-family:'JetBrains Mono',monospace;font-size:15px;padding:12px 56px 12px 14px;border-radius:var(--radius-md);border:0.5px solid var(--border-md);background:var(--surface);color:var(--text-1);outline:none;transition:border-color 0.2s;}
+    .input-wrap input:focus{border-color:var(--text-2);}
+    .input-wrap input::placeholder{color:var(--text-3);}
+    .toggle-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace;padding:4px;transition:color 0.2s;}
+    .toggle-btn:hover{color:var(--text-2);}
+    .meter-bar{height:5px;border-radius:99px;background:var(--border);margin-bottom:0.75rem;overflow:hidden;}
+    .meter-fill{height:100%;border-radius:99px;width:0%;transition:width 0.4s cubic-bezier(0.34,1.56,0.64,1),background 0.3s;}
+    .score-row{display:flex;align-items:center;gap:8px;margin-bottom:1.25rem;}
+    .score-badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--text-3);border:0.5px solid var(--border);transition:all 0.3s;}
+    .entropy-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);margin-left:auto;}
+    .warning-box{display:none;padding:10px 14px;border-radius:var(--radius-md);border:0.5px solid var(--danger-bd);background:var(--danger-bg);color:var(--danger-tx);font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:1rem;}
+    .warning-box.visible{display:block;}
+    .checks-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem;}
+    .check-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-md);border:0.5px solid var(--border);background:var(--surface2);font-size:13px;color:var(--text-2);transition:all 0.25s;}
+    .check-item.pass{background:var(--success-bg);border-color:var(--success-bd);color:var(--success-tx);}
+    .check-dot{width:8px;height:8px;border-radius:50%;background:var(--border-md);flex-shrink:0;transition:background 0.25s;}
+    .check-item.pass .check-dot{background:var(--success-tx);}
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;}
+    .stat-card{background:var(--surface2);border-radius:var(--radius-md);padding:10px 12px;text-align:center;}
+    .stat-val{display:block;font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--text-1);}
+    .stat-lbl{display:block;font-size:11px;color:var(--text-3);margin-top:2px;}
+    .tips-section{display:none;margin-top:1rem;}
+    .tips-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-3);margin-bottom:8px;}
+    .tip-item{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--text-2);padding:5px 0;border-bottom:0.5px solid var(--border);}
+    .tip-item:last-child{border-bottom:none;}
+    .tip-arrow{color:var(--text-3);flex-shrink:0;}
+    .footer{margin-top:2rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);}
+  </style>
+</head>
+<body>
+<div class="card">
+  <p class="eyebrow">Cybersecurity Tool · Project 1</p>
+  <h1>Password Strength Checker</h1>
+  <div class="input-wrap">
+    <input type="password" id="pwInput" placeholder="Enter a password to evaluate…" autocomplete="off" spellcheck="false" oninput="analyze()" />
+    <button class="toggle-btn" onclick="toggleVis()" id="toggleBtn">show</button>
+  </div>
+  <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+  <div class="score-row">
+    <span class="score-badge" id="scoreBadge">Not evaluated</span>
+    <span class="entropy-label" id="entropyLabel"></span>
+  </div>
+  <div class="warning-box" id="warningBox"></div>
+  <div class="checks-grid">
+    <div class="check-item" id="chk-len"><span class="check-dot"></span>12+ characters</div>
+    <div class="check-item" id="chk-upper"><span class="check-dot"></span>Uppercase letter</div>
+    <div class="check-item" id="chk-lower"><span class="check-dot"></span>Lowercase letter</div>
+    <div class="check-item" id="chk-num"><span class="check-dot"></span>Number</div>
+    <div class="check-item" id="chk-sym"><span class="check-dot"></span>Symbol (!@#$…)</div>
+    <div class="check-item" id="chk-norepeat"><span class="check-dot"></span>No repeated chars</div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><span class="stat-val" id="statLen">—</span><span class="stat-lbl">Length</span></div>
+    <div class="stat-card"><span class="stat-val" id="statPool">—</span><span class="stat-lbl">Char pool</span></div>
+    <div class="stat-card"><span class="stat-val" id="statBits">—</span><span class="stat-lbl">Entropy bits</span></div>
+  </div>
+  <div class="tips-section" id="tipsSection">
+    <p class="tips-label">Suggestions</p>
+    <div id="tipsList"></div>
+  </div>
+  <div class="footer">Built for Cybersecurity Internship · Project 1</div>
+</div>
+<script>
+  const COMMON=new Set(["password","123456","qwerty","abc123","letmein","welcome","monkey","dragon","master","pass","passw0rd","admin","login","iloveyou","sunshine","princess","football","shadow","superman","michael","trustno1","baseball","12345678","123456789","password1","password123","1234567890","qwerty123","1q2w3e4r","starwars","hello","killer","jordan23","harley","ranger","batman","1234","1111","000000","hello123"]);
+  let visible=false;
+  function toggleVis(){const i=document.getElementById('pwInput');visible=!visible;i.type=visible?'text':'password';document.getElementById('toggleBtn').textContent=visible?'hide':'show';}
+  function calcEntropy(pw){let p=0;if(/[a-z]/.test(pw))p+=26;if(/[A-Z]/.test(pw))p+=26;if(/[0-9]/.test(pw))p+=10;if(/[^a-zA-Z0-9]/.test(pw))p+=32;return{bits:p>0?Math.round(pw.length*Math.log2(p)):0,pool:p};}
+  function analyze(){
+    const pw=document.getElementById('pwInput').value;
+    const hasUpper=/[A-Z]/.test(pw),hasLower=/[a-z]/.test(pw),hasNum=/[0-9]/.test(pw),hasSym=/[^a-zA-Z0-9]/.test(pw),longEnough=pw.length>=12,noRepeat=!/(.)\1{2,}/.test(pw),isCommon=COMMON.has(pw.toLowerCase());
+    setCheck('chk-len',longEnough);setCheck('chk-upper',hasUpper);setCheck('chk-lower',hasLower);setCheck('chk-num',hasNum);setCheck('chk-sym',hasSym);setCheck('chk-norepeat',noRepeat);
+    const{bits,pool}=calcEntropy(pw);
+    document.getElementById('statLen').textContent=pw.length||'—';
+    document.getElementById('statPool').textContent=pw.length?pool:'—';
+    document.getElementById('statBits').textContent=pw.length?bits+' b':'—';
+    document.getElementById('entropyLabel').textContent=pw.length?bits+' bits of entropy':'';
+    const warn=document.getElementById('warningBox');
+    if(isCommon&&pw.length){warn.textContent='⚠ This password appears in common/leaked password lists.';warn.classList.add('visible');}else{warn.classList.remove('visible');}
+    if(!pw.length){reset();return;}
+    let score=0;
+    if(pw.length>=8)score++;if(pw.length>=12)score++;if(hasUpper)score++;if(hasLower)score++;if(hasNum)score++;if(hasSym)score++;if(noRepeat)score++;if(bits>=60)score++;
+    if(isCommon)score=Math.min(score,2);
+    const fill=document.getElementById('meterFill'),badge=document.getElementById('scoreBadge');
+    let label,pct,fc,bg,bd,tx;
+    if(score<=3||isCommon){label='Weak';pct='28%';fc='#E24B4A';bg='var(--danger-bg)';bd='var(--danger-bd)';tx='var(--danger-tx)';}
+    else if(score<=6){label='Medium';pct='60%';fc='#BA7517';bg='var(--warn-bg)';bd='var(--warn-bd)';tx='var(--warn-tx)';}
+    else{label='Strong';pct='100%';fc='#1D9E75';bg='var(--success-bg)';bd='var(--success-bd)';tx='var(--success-tx)';}
+    fill.style.width=pct;fill.style.background=fc;badge.textContent=label;badge.style.background=bg;badge.style.color=tx;badge.style.border='0.5px solid '+bd;
+    const tips=[];
+    if(!longEnough)tips.push('Use at least 12 characters — length is the biggest entropy driver.');
+    if(!hasUpper)tips.push('Add uppercase letters (A–Z) to expand the character pool.');
+    if(!hasNum)tips.push('Include at least one number (0–9).');
+    if(!hasSym)tips.push('Add symbols like !@#$% to dramatically increase complexity.');
+    if(!noRepeat)tips.push('Avoid repeating the same character 3+ times in a row.');
+    if(isCommon)tips.push('Choose a password not found in common or leaked password lists.');
+    if(bits<60&&pw.length>=8)tips.push('Aim for 60+ bits of entropy — mix all character types.');
+    const tl=document.getElementById('tipsList'),ts=document.getElementById('tipsSection');
+    if(tips.length){tl.innerHTML=tips.map(t=>`<div class="tip-item"><span class="tip-arrow">→</span><span>${t}</span></div>`).join('');ts.style.display='block';}else{ts.style.display='none';}
+  }
+  function setCheck(id,pass){const el=document.getElementById(id);pass?el.classList.add('pass'):el.classList.remove('pass');}
+  function reset(){
+    document.getElementById('meterFill').style.width='0%';
+    const b=document.getElementById('scoreBadge');b.textContent='Not evaluated';b.style.background='var(--surface2)';b.style.color='var(--text-3)';b.style.border='0.5px solid var(--border)';
+    document.getElementById('entropyLabel').textContent='';
+    ['chk-len','chk-upper','chk-lower','chk-num','chk-sym','chk-norepeat'].forEach(id=>setCheck(id,false));
+    document.getElementById('statLen').textContent='—';document.getElementById('statPool').textContent='—';document.getElementById('statBits').textContent='—';
+    document.getElementById('tipsSection').style.display='none';document.getElementById('warningBox').classList.remove('visible');
+  }
+</script>
+</body>
+</html>
